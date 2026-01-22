@@ -1,0 +1,2 @@
+-- Autoload plugin
+-- Users should call require("im-autoswitch").setup() in their config
