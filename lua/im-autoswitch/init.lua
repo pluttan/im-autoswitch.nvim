@@ -7,9 +7,16 @@ M.config = {
     im_select_command = "/usr/local/bin/im-select",
     default_im = "com.apple.keylayout.US",
     set_previous_im_on_enter = true,
+    debug = false,
 }
 
 local saved_im = nil
+
+local function log(msg)
+    if M.config.debug then
+        print("[im-autoswitch] " .. msg)
+    end
+end
 
 local function get_current_im()
     local result = vim.fn.system(M.config.im_select_command)
@@ -47,16 +54,22 @@ function M.setup(opts)
 
     local function should_switch()
         local mode = vim.fn.mode()
+        local buftype = vim.bo.buftype
+        local filetype = vim.bo.filetype
+
+        log("mode=" .. mode .. " buftype=" .. buftype .. " filetype=" .. filetype)
+
         if mode == "c" then
+            log("skip: cmdline mode")
             return false
         end
         -- Ignore telescope and other floating windows
-        local buftype = vim.bo.buftype
-        local filetype = vim.bo.filetype
         if buftype == "prompt" or buftype == "nofile" then
+            log("skip: buftype=" .. buftype)
             return false
         end
         if filetype:match("^Telescope") or filetype:match("^telescope") then
+            log("skip: telescope")
             return false
         end
         return true
