@@ -56,17 +56,6 @@ function M.setup(opts)
         group = group,
         callback = M.restore_saved_im,
     })
-
-    -- Also handle CmdlineLeave for command mode
-    vim.api.nvim_create_autocmd("CmdlineLeave", {
-        group = group,
-        callback = M.save_and_switch_to_default,
-    })
-
-    vim.api.nvim_create_autocmd("CmdlineEnter", {
-        group = group,
-        callback = M.restore_saved_im,
-    })
 end
 
 return M
