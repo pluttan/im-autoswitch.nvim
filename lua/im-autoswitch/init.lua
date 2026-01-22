@@ -45,25 +45,39 @@ function M.setup(opts)
 
     local group = vim.api.nvim_create_augroup("ImAutoswitch", { clear = true })
 
+    local function should_switch()
+        local mode = vim.fn.mode()
+        if mode == "c" then
+            return false
+        end
+        -- Ignore telescope and other floating windows
+        local buftype = vim.bo.buftype
+        local filetype = vim.bo.filetype
+        if buftype == "prompt" or buftype == "nofile" then
+            return false
+        end
+        if filetype:match("^Telescope") or filetype:match("^telescope") then
+            return false
+        end
+        return true
+    end
+
     -- Save current layout and switch to default when leaving Insert
     vim.api.nvim_create_autocmd("InsertLeave", {
         group = group,
         callback = function()
-            -- Ignore if entering cmdline
-            local mode = vim.fn.mode()
-            if mode == "c" then
+            if not should_switch() then
                 return
             end
             M.save_and_switch_to_default()
         end,
     })
 
-    -- Restore saved layout when entering Insert (but not cmdline)
+    -- Restore saved layout when entering Insert (but not cmdline/telescope)
     vim.api.nvim_create_autocmd("InsertEnter", {
         group = group,
         callback = function()
-            local mode = vim.fn.mode()
-            if mode == "c" then
+            if not should_switch() then
                 return
             end
             M.restore_saved_im()
