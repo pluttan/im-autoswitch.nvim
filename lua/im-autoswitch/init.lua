@@ -48,13 +48,26 @@ function M.setup(opts)
     -- Save current layout and switch to default when leaving Insert
     vim.api.nvim_create_autocmd("InsertLeave", {
         group = group,
-        callback = M.save_and_switch_to_default,
+        callback = function()
+            -- Ignore if entering cmdline
+            local mode = vim.fn.mode()
+            if mode == "c" then
+                return
+            end
+            M.save_and_switch_to_default()
+        end,
     })
 
-    -- Restore saved layout when entering Insert
+    -- Restore saved layout when entering Insert (but not cmdline)
     vim.api.nvim_create_autocmd("InsertEnter", {
         group = group,
-        callback = M.restore_saved_im,
+        callback = function()
+            local mode = vim.fn.mode()
+            if mode == "c" then
+                return
+            end
+            M.restore_saved_im()
+        end,
     })
 end
 
