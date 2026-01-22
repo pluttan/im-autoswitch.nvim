@@ -23,10 +23,12 @@ local function set_im(im)
 end
 
 function M.save_and_switch_to_default()
-    saved_im = get_current_im()
-    if saved_im ~= M.config.default_im then
-        set_im(M.config.default_im)
+    local current = get_current_im()
+    -- Only save if it's not the default (to avoid saving English as "previous")
+    if current ~= M.config.default_im then
+        saved_im = current
     end
+    set_im(M.config.default_im)
 end
 
 function M.restore_saved_im()
@@ -37,6 +39,9 @@ end
 
 function M.setup(opts)
     M.config = vim.tbl_deep_extend("force", M.config, opts or {})
+
+    -- Switch to default IM on startup
+    set_im(M.config.default_im)
 
     local group = vim.api.nvim_create_augroup("ImAutoswitch", { clear = true })
 
