@@ -96,6 +96,17 @@ function M.setup(opts)
             M.restore_saved_im()
         end,
     })
+
+    -- Switch to default when Neovim gains focus (if in Normal mode)
+    vim.api.nvim_create_autocmd("FocusGained", {
+        group = group,
+        callback = function()
+            local mode = vim.fn.mode()
+            if mode == "n" or mode == "v" or mode == "V" then
+                set_im(M.config.default_im)
+            end
+        end,
+    })
 end
 
 return M
