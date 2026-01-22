@@ -12,24 +12,21 @@ M.config = {
 local saved_im = nil
 
 local function get_current_im()
-    local handle = io.popen(M.config.im_select_command)
-    if handle then
-        local result = handle:read("*a"):gsub("%s+", "")
-        handle:close()
-        return result
-    end
-    return nil
+    local result = vim.fn.system(M.config.im_select_command)
+    return vim.trim(result)
 end
 
 local function set_im(im)
-    if im then
-        os.execute(M.config.im_select_command .. " " .. im)
+    if im and im ~= "" then
+        vim.fn.system(M.config.im_select_command .. " " .. im)
     end
 end
 
 function M.save_and_switch_to_default()
     saved_im = get_current_im()
-    set_im(M.config.default_im)
+    if saved_im ~= M.config.default_im then
+        set_im(M.config.default_im)
+    end
 end
 
 function M.restore_saved_im()
